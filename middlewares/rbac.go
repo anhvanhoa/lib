@@ -8,12 +8,15 @@ import (
 	"github.com/kataras/iris/v12"
 )
 
-func RBACMiddleware(rules *[]routes.Rule, auth func(ctx iris.Context) []rbac.Role, handleErrForbidden func(ctx iris.Context)) iris.Handler {
+func RBACMiddleware(rules *[]routes.Rule, auth func(ctx iris.Context) ([]rbac.Role, error), handleErrForbidden func(ctx iris.Context)) iris.Handler {
 	return func(ctx iris.Context) {
 		for _, rule := range *rules {
 			matchPath := matchPath(ctx.Path(), rule.Path)
 			if matchPath && ctx.Method() == rule.Method && rule.Status {
-				roles := auth(ctx)
+				roles, err := auth(ctx)
+				if err != nil {
+					return
+				}
 				if rbac.AllowAdmin()(roles) {
 					break
 				}
