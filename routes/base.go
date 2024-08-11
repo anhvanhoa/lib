@@ -53,7 +53,7 @@ var AllRouter []Rule
 
 func LoadRoutes(f func() []models.RbacRule, rules ...[]Rule) {
 	var rulesDB = ConvertRuleFormDb(f())
-	rulesDefault := RoutesDefault()
+	rulesDefault := RoutesDefault(rules...)
 	AllRouter = *MergerRules(rulesDB, rulesDefault)
 }
 
